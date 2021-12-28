@@ -14,7 +14,9 @@ static const char *const TAG = "xiaomi_ylkg07yl";
 void XiaomiYLKG07YL::dump_config() {
   ESP_LOGCONFIG(TAG, "Xiaomi YLKG07YL");
   ESP_LOGCONFIG(TAG, "  Bindkey: %s", hexencode(this->bindkey_, 12).c_str());
-  LOG_SENSOR("  ", "Keycode", this->keycode_);
+  LOG_SENSOR("  ", "Keycode", this->keycode_sensor_);
+  LOG_SENSOR("  ", "Encoder value", this->encoder_value_sensor_);
+  LOG_SENSOR("  ", "Action type", this->action_type_sensor_);
 }
 
 bool XiaomiYLKG07YL::parse_device(const esp32_ble_tracker::ESPBTDevice &device) {
@@ -44,8 +46,14 @@ bool XiaomiYLKG07YL::parse_device(const esp32_ble_tracker::ESPBTDevice &device) 
       continue;
     }
     if (res->keycode.has_value()) {
-      if (this->keycode_ != nullptr)
-        this->keycode_->publish_state(*res->keycode);
+      if (this->keycode_sensor_ != nullptr)
+        this->keycode_sensor_->publish_state(*res->keycode);
+
+      if (this->encoder_value_sensor_ != nullptr)
+        this->encoder_value_sensor_->publish_state(*res->encoder_value);
+
+      if (this->action_type_sensor_ != nullptr)
+        this->action_type_sensor_->publish_state(*res->action_type);
 
       this->receive_callback_.call(*res->keycode, *res->encoder_value, *res->action_type);
     }

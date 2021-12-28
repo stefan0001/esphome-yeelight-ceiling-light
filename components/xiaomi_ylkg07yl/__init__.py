@@ -17,7 +17,16 @@ CODEOWNERS = ["@syssi"]
 DEPENDENCIES = ["esp32_ble_tracker"]
 MULTI_CONF = True
 
-CONF_LAST_BUTTON_PRESSED = "last_button_pressed"
+CONF_KEYCODE = "keycode"
+CONF_ENCODER_VALUE = "encoder_value"
+CONF_ACTION_TYPE = "action_type"
+
+SENSORS = [
+    CONF_KEYCODE,
+    CONF_ENCODER_VALUE,
+    CONF_ACTION_TYPE,
+]
+
 CONF_ON_PRESS = "on_press"
 CONF_ON_PRESS_AND_ROTATE = "on_press_and_rotate"
 CONF_ON_ROTATE = "on_rotate"
@@ -70,7 +79,13 @@ CONFIG_SCHEMA = (
             cv.GenerateID(): cv.declare_id(XiaomiYLKG07YL),
             cv.Required(CONF_MAC_ADDRESS): cv.mac_address,
             cv.Required(CONF_BINDKEY): validate_short_bind_key,
-            cv.Optional(CONF_LAST_BUTTON_PRESSED): sensor.sensor_schema(
+            cv.Optional(CONF_KEYCODE): sensor.sensor_schema(
+                UNIT_EMPTY, ICON_EMPTY, 1, DEVICE_CLASS_EMPTY
+            ),
+            cv.Optional(CONF_ENCODER_VALUE): sensor.sensor_schema(
+                UNIT_EMPTY, ICON_EMPTY, 1, DEVICE_CLASS_EMPTY
+            ),
+            cv.Optional(CONF_ACTION_TYPE): sensor.sensor_schema(
                 UNIT_EMPTY, ICON_EMPTY, 1, DEVICE_CLASS_EMPTY
             ),
             cv.Optional(CONF_ON_PRESS): automation.validate_automation(
@@ -105,9 +120,11 @@ async def to_code(config):
     cg.add(var.set_address(config[CONF_MAC_ADDRESS].as_hex))
     cg.add(var.set_bindkey(config[CONF_BINDKEY]))
 
-    if CONF_LAST_BUTTON_PRESSED in config:
-        sens = await sensor.new_sensor(config[CONF_LAST_BUTTON_PRESSED])
-        cg.add(var.set_keycode(sens))
+    for key in SENSORS:
+        if key in config:
+            conf = config[key]
+            sens = await sensor.new_sensor(conf)
+            cg.add(getattr(var, f"set_{key}_sensor")(sens))
 
     for action in ON_PRESS_ACTIONS:
         for conf in config.get(action, []):

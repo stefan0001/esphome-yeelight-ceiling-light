@@ -35,8 +35,15 @@ esp32_ble_tracker:
 xiaomi_ylkg07yl:
   mac_address: "F8:24:41:C4:7B:BC"
   bindkey: "ef3afd53f5c7853a080a3d52"
-  last_button_pressed:
-    name: "last button pressed"
+  keycode:
+    name: "last keycode"
+    id: keycode
+  encoder_value:
+    name: "last encoder value"
+    id: encoder_value
+  action_type:
+    name: "last action type"
+    id: action_type
   on_press:
     then:
       - logger.log: "Button press"
