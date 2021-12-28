@@ -17,6 +17,7 @@ CODEOWNERS = ["@syssi"]
 DEPENDENCIES = ["esp32_ble_tracker"]
 MULTI_CONF = True
 
+CONF_LAST_BUTTON_PRESSED = "last_button_pressed"
 CONF_ON_BUTTON_ON = "on_button_on"
 
 ON_PRESS_ACTIONS = [
@@ -57,6 +58,9 @@ CONFIG_SCHEMA = (
             cv.GenerateID(): cv.declare_id(XiaomiYLKG07YL),
             cv.Required(CONF_MAC_ADDRESS): cv.mac_address,
             cv.Required(CONF_BINDKEY): validate_short_bind_key,
+            cv.Optional(CONF_LAST_BUTTON_PRESSED): sensor.sensor_schema(
+                UNIT_EMPTY, ICON_EMPTY, 1, DEVICE_CLASS_EMPTY
+            ),
             cv.Optional(CONF_ON_BUTTON_ON): automation.validate_automation(
                 {
                     cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(OnButtonOnTrigger),
@@ -76,6 +80,10 @@ async def to_code(config):
 
     cg.add(var.set_address(config[CONF_MAC_ADDRESS].as_hex))
     cg.add(var.set_bindkey(config[CONF_BINDKEY]))
+
+    if CONF_LAST_BUTTON_PRESSED in config:
+        sens = await sensor.new_sensor(config[CONF_LAST_BUTTON_PRESSED])
+        cg.add(var.set_keycode(sens))
 
     for action in ON_PRESS_ACTIONS:
         for conf in config.get(action, []):
