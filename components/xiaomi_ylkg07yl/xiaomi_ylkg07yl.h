@@ -1,4 +1,4 @@
-#pragma once
+#pragma once>
 
 #include "esphome/components/esp32_ble_tracker/esp32_ble_tracker.h"
 #include "esphome/components/sensor/sensor.h"
@@ -8,15 +8,13 @@
 
 #ifdef USE_ESP32
 
+static const uint8_t KEY_CODE_BUTTON = 0;
+
+static const uint8_t ACTION_TYPE_PRESS = 3;
+static const uint8_t ACTION_TYPE_ROTATE = 4;
+
 namespace esphome {
 namespace xiaomi_ylkg07yl {
-
-static const uint8_t BUTTON_ON = 0;
-static const uint8_t BUTTON_OFF = 1;
-static const uint8_t BUTTON_SUN = 2;
-static const uint8_t BUTTON_M = 4;
-static const uint8_t BUTTON_PLUS = 3;
-static const uint8_t BUTTON_MINUS = 5;
 
 class XiaomiYLKG07YL : public Component, public esp32_ble_tracker::ESPBTDeviceListener {
  public:
@@ -28,22 +26,44 @@ class XiaomiYLKG07YL : public Component, public esp32_ble_tracker::ESPBTDeviceLi
   void dump_config() override;
   float get_setup_priority() const override { return setup_priority::DATA; }
   void set_keycode(sensor::Sensor *keycode) { keycode_ = keycode; }
-  void add_on_receive_callback(std::function<void(int)> &&callback);
+  void add_on_receive_callback(std::function<void(int, int, int)> &&callback);
 
  protected:
   uint64_t address_;
   uint8_t bindkey_[12];
   sensor::Sensor *keycode_{nullptr};
-  CallbackManager<void(int)> receive_callback_{};
+  CallbackManager<void(int, int, int)> receive_callback_{};
 
   bool decrypt_mibeacon_v23_(std::vector<uint8_t> &raw, const uint8_t *bindkey, const uint64_t &address);
 };
 
-class OnButtonOnTrigger : public Trigger<> {
+class OnPressTrigger : public Trigger<> {
  public:
-  OnButtonOnTrigger(XiaomiYLKG07YL *a_remote) {
-    a_remote->add_on_receive_callback([this](int keycode) {
-      if (keycode == BUTTON_ON) {
+  OnPressTrigger(XiaomiYLKG07YL *a_remote) {
+    a_remote->add_on_receive_callback([this](int keycode, int encoder_value, int action_type) {
+      if (action_type == ACTION_TYPE_PRESS && keycode == KEY_CODE_BUTTON) {
+        this->trigger();
+      }
+    });
+  }
+};
+
+class OnRotateTrigger : public Trigger<> {
+ public:
+  OnRotateTrigger(XiaomiYLKG07YL *a_remote) {
+    a_remote->add_on_receive_callback([this](int keycode, int encoder_value, int action_type) {
+      if (action_type == ACTION_TYPE_ROTATE && keycode == KEY_CODE_BUTTON) {
+        this->trigger();
+      }
+    });
+  }
+};
+
+class OnPressAndRotateTrigger : public Trigger<> {
+ public:
+  OnPressAndRotateTrigger(XiaomiYLKG07YL *a_remote) {
+    a_remote->add_on_receive_callback([this](int keycode, int encoder_value, int action_type) {
+      if (action_type == ACTION_TYPE_ROTATE && keycode != KEY_CODE_BUTTON) {
         this->trigger();
       }
     });

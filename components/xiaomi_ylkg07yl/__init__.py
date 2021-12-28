@@ -18,10 +18,14 @@ DEPENDENCIES = ["esp32_ble_tracker"]
 MULTI_CONF = True
 
 CONF_LAST_BUTTON_PRESSED = "last_button_pressed"
-CONF_ON_BUTTON_ON = "on_button_on"
+CONF_ON_PRESS = "on_press"
+CONF_ON_PRESS_AND_ROTATE = "on_press_and_rotate"
+CONF_ON_ROTATE = "on_rotate"
 
 ON_PRESS_ACTIONS = [
-    CONF_ON_BUTTON_ON,
+    CONF_ON_PRESS,
+    CONF_ON_PRESS_AND_ROTATE,
+    CONF_ON_ROTATE,
 ]
 
 xiaomi_ylkg07yl_ns = cg.esphome_ns.namespace("xiaomi_ylkg07yl")
@@ -29,8 +33,16 @@ XiaomiYLKG07YL = xiaomi_ylkg07yl_ns.class_(
     "XiaomiYLKG07YL", esp32_ble_tracker.ESPBTDeviceListener, cg.Component
 )
 
-OnButtonOnTrigger = xiaomi_ylkg07yl_ns.class_(
-    "OnButtonOnTrigger", automation.Trigger.template()
+OnPressTrigger = xiaomi_ylkg07yl_ns.class_(
+    "OnPressTrigger", automation.Trigger.template()
+)
+
+OnPressAndRotateTrigger = xiaomi_ylkg07yl_ns.class_(
+    "OnPressAndRotateTrigger", automation.Trigger.template()
+)
+
+OnRotateTrigger = xiaomi_ylkg07yl_ns.class_(
+    "OnRotateTrigger", automation.Trigger.template()
 )
 
 
@@ -61,9 +73,21 @@ CONFIG_SCHEMA = (
             cv.Optional(CONF_LAST_BUTTON_PRESSED): sensor.sensor_schema(
                 UNIT_EMPTY, ICON_EMPTY, 1, DEVICE_CLASS_EMPTY
             ),
-            cv.Optional(CONF_ON_BUTTON_ON): automation.validate_automation(
+            cv.Optional(CONF_ON_PRESS): automation.validate_automation(
                 {
-                    cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(OnButtonOnTrigger),
+                    cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(OnPressTrigger),
+                }
+            ),
+            cv.Optional(CONF_ON_PRESS_AND_ROTATE): automation.validate_automation(
+                {
+                    cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(
+                        OnPressAndRotateTrigger
+                    ),
+                }
+            ),
+            cv.Optional(CONF_ON_ROTATE): automation.validate_automation(
+                {
+                    cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(OnRotateTrigger),
                 }
             ),
         }

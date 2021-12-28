@@ -16,12 +16,12 @@ bool parse_xiaomi_value(uint8_t value_type, const uint8_t *data, uint8_t value_l
   // remote control key code, 3 bytes
   if ((value_type == 0x01) && (value_length == 3)) {
     result.keycode = data[0];
-    result.dimmer = data[1];
-    result.press_type = data[2];
-    ESP_LOGD(TAG, "Key code: %d", data[0]);    // button
-    ESP_LOGD(TAG, "Dimmer: %d", data[1]);      // value
-    ESP_LOGD(TAG, "Press type: %d", data[2]);  // 0: single press, 1: double press, 2: long press, 3: ???,
-                                               // 4: dimmer <= 127 = rotate right / else: rotate left
+    result.encoder_value = data[1];
+    result.action_type = data[2];
+    ESP_LOGD(TAG, "Key code: %d", data[0]);
+    ESP_LOGD(TAG, "Encoder value: %d", data[1]);
+    ESP_LOGD(TAG, "Action type: %d", data[2]);  // 0: single press, 1: double press, 2: long press, 3: ???,
+                                                // 4: dimmer <= 127 = rotate right / else: rotate left
   }
   // motion detection, 1 byte, 8-bit unsigned integer
   else if ((value_type == 0x03) && (value_length == 1)) {

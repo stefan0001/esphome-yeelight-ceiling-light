@@ -30,8 +30,8 @@ struct XiaomiParseResult {
   } type;
   std::string name;
   optional<int> keycode;
-  optional<int> dimmer;
-  optional<int> press_type;
+  optional<int> encoder_value;
+  optional<int> action_type;
   optional<float> temperature;
   optional<float> humidity;
   optional<float> moisture;

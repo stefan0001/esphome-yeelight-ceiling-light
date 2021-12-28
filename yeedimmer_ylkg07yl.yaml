@@ -37,6 +37,12 @@ xiaomi_ylkg07yl:
   bindkey: "ef3afd53f5c7853a080a3d52"
   last_button_pressed:
     name: "last button pressed"
-  on_button_on:
+  on_press:
     then:
-      - logger.log: "Button on pressed"
+      - logger.log: "Button press"
+  on_press_and_rotate:
+    then:
+      - logger.log: "Button press and rotate"
+  on_rotate:
+    then:
+      - logger.log: "Button rotate"
