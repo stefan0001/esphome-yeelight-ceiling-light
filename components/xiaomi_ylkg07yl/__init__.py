@@ -80,13 +80,13 @@ CONFIG_SCHEMA = (
             cv.Required(CONF_MAC_ADDRESS): cv.mac_address,
             cv.Required(CONF_BINDKEY): validate_short_bind_key,
             cv.Optional(CONF_KEYCODE): sensor.sensor_schema(
-                UNIT_EMPTY, ICON_EMPTY, 1, DEVICE_CLASS_EMPTY
+                UNIT_EMPTY, ICON_EMPTY, 0, DEVICE_CLASS_EMPTY
             ),
             cv.Optional(CONF_ENCODER_VALUE): sensor.sensor_schema(
-                UNIT_EMPTY, ICON_EMPTY, 1, DEVICE_CLASS_EMPTY
+                UNIT_EMPTY, ICON_EMPTY, 0, DEVICE_CLASS_EMPTY
             ),
             cv.Optional(CONF_ACTION_TYPE): sensor.sensor_schema(
-                UNIT_EMPTY, ICON_EMPTY, 1, DEVICE_CLASS_EMPTY
+                UNIT_EMPTY, ICON_EMPTY, 0, DEVICE_CLASS_EMPTY
             ),
             cv.Optional(CONF_ON_PRESS): automation.validate_automation(
                 {

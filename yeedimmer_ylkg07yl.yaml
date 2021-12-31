@@ -1,5 +1,6 @@
 substitutions:
   name: yeedimmer
+  light_entity: light.office_desk
 
 esphome:
   name: ${name}
@@ -21,9 +22,14 @@ wifi:
 
 ota:
 api:
+  password: !secret api_password
 
 logger:
-  level: DEBUG
+  level: VERY_VERBOSE
+  logs:
+    esp32_ble_tracker: WARN
+    xiaomi_ylkg07yl: DEBUG
+    api.service: WARN
 
 esp32_ble_tracker:
   scan_parameters:
@@ -38,18 +44,39 @@ xiaomi_ylkg07yl:
   keycode:
     name: "last keycode"
     id: keycode
+#    internal: true
   encoder_value:
     name: "last encoder value"
     id: encoder_value
+#    internal: true
   action_type:
     name: "last action type"
     id: action_type
+#    internal: true
   on_press:
     then:
-      - logger.log: "Button press"
+      - logger.log: "Press event"
+      - homeassistant.service:
+          service: light.toggle
+          data:
+            entity_id: ${light_entity}
+  on_rotate:
+    then:
+      - logger.log: "Rotate event"
+      - homeassistant.service:
+          service: light.turn_on
+          data:
+            entity_id: ${light_entity}
+          data_template:
+            brightness_step_pct: "{{ step }}"
+          variables:
+            step: |-
+              if (id(encoder_value).state <= 127) {
+                return id(encoder_value).state * 2.5;
+              } else {
+                return (256 - id(encoder_value).state) * 2.5 * -1;
+              }
+
   on_press_and_rotate:
     then:
       - logger.log: "Button press and rotate"
-  on_rotate:
-    then:
-      - logger.log: "Button rotate"
